@@ -1,0 +1,25 @@
+meta {
+  name: Me (rota protegida)
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/users/me
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("status 200", function() {
+    expect(res.getStatus()).to.equal(200);
+  });
+
+  test("retorna o usuário logado", function() {
+    expect(res.getBody().name).to.equal(bru.interpolate("{{userName}}"));
+  });
+}

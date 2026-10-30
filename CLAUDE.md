@@ -3,7 +3,7 @@
 ## Stack
 
 - **Node.js** + **Express v5**
-- **PostgreSQL** via `pg` (Pool com SSL `rejectUnauthorized: false` para DigitalOcean)
+- **PostgreSQL** via `pg` (Pool com SSL `rejectUnauthorized: false` para AWS RDS)
 - **Zod v4** — validação de entrada
 - **bcrypt** — hash de senha (10 salt rounds)
 - **jsonwebtoken** — tokens JWT (expiração 1h)
@@ -133,14 +133,7 @@ router.post("/partida", auth, salvarPartida)
 
 ## Banco de dados
 
-**Conexão:** DigitalOcean PostgreSQL (porta 25060, SSL sem verificação de certificado)
-
-```
-Host: db-postgresql-nyc3-19998-do-user-14541416-0.h.db.ondigitalocean.com
-Porta: 25060
-Database: defaultdb
-User: doadmin
-```
+**Conexão:** AWS RDS PostgreSQL (porta 5432, SSL sem verificação de certificado). Credenciais no `.env` (modelo em `.env.example`).
 
 O arquivo `src/db/index.js` exporta um Pool já configurado — importar direto:
 ```js

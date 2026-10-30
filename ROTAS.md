@@ -166,18 +166,30 @@ Grava um resultado já corrigido no cliente (quizzes locais do EsporteKids). Pon
 ### 9. Ranking 🔒
 **GET** `/ranking`
 
-Top 10 usuários pela soma das pontuações.
+Top 10 usuários pela soma das pontuações (empate = mesma posição; desempata a ordem quem chegou primeiro).
 
 **Resposta (200):**
 ```json
-[{ "posicao": "1", "id": 1, "nome": "João", "pontuacao_total": "120", "partidas": "4", "ultima_jogada": "2026-10-23T20:00:00.000Z" }]
+[{ "posicao": 1, "id": 1, "nome": "João", "pontuacao_total": 120, "partidas": 4, "acertos": 12, "total_perguntas": 20, "melhor_partida": 50, "ultima_jogada": "2026-10-23T20:00:00.000Z" }]
 ```
-
-> `posicao`, `pontuacao_total` e `partidas` chegam como **string** (bigint do PostgreSQL).
 
 ---
 
-### 10. Admin (cargo `adm`) 🔒
+### 10. Minha posição no ranking 🔒
+**GET** `/ranking/eu`
+
+Posição do usuário logado no ranking geral (mesmo fora do top 10).
+
+**Resposta (200):**
+```json
+{ "posicao": 14, "id": 3, "nome": "Ana", "pontuacao_total": 40, "partidas": 2, "acertos": 4, "total_perguntas": 10, "melhor_partida": 30, "total_jogadores": 25 }
+```
+
+> Quem ainda não jogou recebe `posicao: null` e os totais zerados.
+
+---
+
+### 11. Admin (cargo `adm`) 🔒
 - **GET** `/admin/perguntas`
 - **POST** `/admin/perguntas`
 - **PUT** `/admin/perguntas/:id`
@@ -203,9 +215,10 @@ Top 10 usuários pela soma das pontuações.
 
 ```bash
 JWT_SECRET=sua-chave-secreta
-DB_HOST=host-do-postgres
-DB_DATABASE=defaultdb
-DB_USER=doadmin
+DB_HOST=seu-banco.xxxx.us-east-1.rds.amazonaws.com
+DB_PORT=5432
+DB_DATABASE=postgres
+DB_USER=postgres
 DB_PASSWORD=
 PORT=3000
 FRONTEND_URL=http://localhost:5173   # origem liberada no CORS

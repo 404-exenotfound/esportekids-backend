@@ -5,14 +5,16 @@
 -- Usuarios
 CREATE TABLE IF NOT EXISTS usuarios (
   id         SERIAL PRIMARY KEY,
-  nome       VARCHAR(255) NOT NULL,
-  email      VARCHAR(255) UNIQUE NOT NULL,
+  -- Nome escolhido numa lista fixa (ver src/routes/user/nomes.js),
+  -- com número quando repete: Pedro, Pedro2, Pedro3...
+  nome       VARCHAR(255) UNIQUE NOT NULL,
   senha      VARCHAR(255) NOT NULL,
   cargo      VARCHAR(10)  NOT NULL DEFAULT 'cliente',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email);
+-- Login compara sem diferenciar maiúscula/minúscula
+CREATE INDEX IF NOT EXISTS idx_usuarios_nome_lower ON usuarios(LOWER(nome));
 
 -- Materias
 CREATE TABLE IF NOT EXISTS materias (

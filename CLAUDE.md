@@ -102,8 +102,8 @@ module.exports = dominioRouter
 ```js
 const { rows } = await db.query(
   `-- sql
-  SELECT id, nome FROM usuarios WHERE email = $1`,
-  [email]
+  SELECT id, nome FROM usuarios WHERE nome = $1`,
+  [nome]
 )
 ```
 
@@ -148,7 +148,7 @@ const { db } = require("../../db") // ajustar caminho relativo
 | Criado | 201 |
 | Validação falhou | 400 |
 | Não autenticado | 401 |
-| Conflito (ex: email duplicado) | 409 |
+| Conflito (ex: nome duplicado) | 409 |
 | Erro interno | 500 |
 
 ## Variáveis de ambiente

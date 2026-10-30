@@ -4,11 +4,11 @@ const jwt = require("jsonwebtoken");
 const { db } = require("../../db");
 
 const loginSchema = z.object({
-  email: z.email("Email invalido"),
+  nome: z.string().trim().min(1, "Nome obrigatório"),
   senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
 });
 
-// curl -X POST -H "Content-Type: application/json" -d '{"email": "joaobilheiro@outlook.com", "senha": "123456"}' http://localhost:3000/login
+// curl -X POST -H "Content-Type: application/json" -d '{"nome": "Pedro2", "senha": "123456"}' http://localhost:3000/login
 const login = async (req, res) => {
     try {
       const parsed = loginSchema.safeParse(req.body);
@@ -19,23 +19,23 @@ const login = async (req, res) => {
         });
       }
 
-      const { email, senha } = parsed.data;
+      const { nome, senha } = parsed.data;
 
+      // Sem diferenciar maiúscula/minúscula: "pedro2" entra como "Pedro2"
       const { rows } = await db.query(`-- sql
         SELECT
           id,
           nome,
-          email,
           senha,
           cargo
         FROM usuarios
         WHERE
-          email = $1
-      `, [email]);
+          LOWER(nome) = LOWER($1)
+      `, [nome]);
 
       if (!rows.length) {
-        return res.status(401).json({ 
-          error: "Credenciais inválidas" 
+        return res.status(401).json({
+          error: "Nome ou senha incorretos"
         });
       }
 
@@ -45,8 +45,8 @@ const login = async (req, res) => {
       const senhaValida = await bcrypt.compare(senha, usuario.senha);
 
       if (!senhaValida) {
-        return res.status(401).json({ 
-          error: "Credenciais inválidas" 
+        return res.status(401).json({
+          error: "Nome ou senha incorretos"
         });
       }
 
@@ -54,7 +54,6 @@ const login = async (req, res) => {
         {
           sub: usuario.id,
           nome: usuario.nome,
-          email: usuario.email,
           cargo: usuario.cargo,
         },
         process.env.JWT_SECRET,
@@ -67,17 +66,15 @@ const login = async (req, res) => {
         usuario: {
           id: usuario.id,
           nome: usuario.nome,
-          email: usuario.email,
           cargo: usuario.cargo,
         },
       });
     } catch (error) {
       console.error("Erro ao fazer login:", error);
-      return res.status(500).json({ 
-        error: "Erro ao processar login" 
+      return res.status(500).json({
+        error: "Erro ao processar login"
       });
     }
   };
 
 module.exports = { login, loginSchema };
-

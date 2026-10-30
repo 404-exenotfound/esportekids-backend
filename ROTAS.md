@@ -25,12 +25,12 @@ Verifica se a API está rodando.
 ### 2. Login
 **POST** `/login`
 
-Realiza login de um usuário existente.
+Entra com o nome de jogador (sem diferenciar maiúscula/minúscula) e a senha.
 
 **Request Body:**
 ```json
 {
-  "email": "usuario@example.com",
+  "nome": "Pedro2",
   "senha": "senha123"
 }
 ```
@@ -40,31 +40,41 @@ Realiza login de um usuário existente.
 {
   "message": "Login realizado com sucesso",
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "usuario": {
-    "id": 1,
-    "nome": "João Silva",
-    "email": "usuario@example.com"
-  }
+  "usuario": { "id": 1, "nome": "Pedro2", "cargo": "cliente" }
 }
 ```
 
 **Erros:**
 - **400:** Dados inválidos
-- **401:** Credenciais inválidas (email ou senha incorretos)
+- **401:** Nome ou senha incorretos
 - **500:** Erro ao processar login
 
 ---
 
-### 3. Registro
+### 3. Nomes disponíveis
+**GET** `/nomes`
+
+Lista de nomes que podem ser escolhidos no cadastro (definida em `src/routes/user/nomes.js`) e o nome que a pessoa vai receber se escolher cada um agora.
+
+**Resposta (200):**
+```json
+[
+  { "base": "Joao",  "proximo": "Joao" },
+  { "base": "Pedro", "proximo": "Pedro2" }
+]
+```
+
+---
+
+### 4. Registro
 **POST** `/registro`
 
-Registra um novo usuário com senha hasheada usando bcrypt.
+Cria a conta com um nome da lista. Se o nome já foi usado, recebe o próximo número (`Pedro` → `Pedro2` → `Pedro3`...). Senha com hash bcrypt.
 
 **Request Body:**
 ```json
 {
-  "nome": "João Silva",
-  "email": "joao@example.com",
+  "nome": "Pedro",
   "senha": "senha123"
 }
 ```
@@ -74,24 +84,20 @@ Registra um novo usuário com senha hasheada usando bcrypt.
 {
   "message": "Usuário registrado com sucesso",
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "usuario": {
-    "id": 1,
-    "nome": "João Silva",
-    "email": "joao@example.com"
-  }
+  "usuario": { "id": 1, "nome": "Pedro2", "cargo": "cliente" }
 }
 ```
 
 **Erros:**
-- **400:** Dados inválidos
-- **409:** Email já cadastrado
+- **400:** Dados inválidos (nome fora da lista ou senha curta)
+- **409:** Nome escolhido por outra pessoa ao mesmo tempo (tentar de novo)
 - **500:** Erro ao processar registro
 
 ---
 
 > Rotas marcadas com 🔒 exigem o header `Authorization: Bearer <token>` (401 sem token ou com token inválido/expirado).
 
-### 4. Matérias
+### 5. Matérias
 **GET** `/materias`
 
 Lista as matérias. No EsporteKids, cada esporte é uma matéria (casada pelo nome).
@@ -103,7 +109,7 @@ Lista as matérias. No EsporteKids, cada esporte é uma matéria (casada pelo no
 
 ---
 
-### 5. Quiz 🔒
+### 6. Quiz 🔒
 **GET** `/quiz?materias=1,2`
 
 Até 10 perguntas aleatórias das matérias informadas (sem indicar a correta).
@@ -112,7 +118,7 @@ Até 10 perguntas aleatórias das matérias informadas (sem indicar a correta).
 
 ---
 
-### 6. Salvar partida 🔒
+### 7. Salvar partida 🔒
 **POST** `/partida`
 
 Corrige no servidor as respostas de um quiz vindo de `/quiz`.
@@ -132,7 +138,7 @@ Corrige no servidor as respostas de um quiz vindo de `/quiz`.
 
 ---
 
-### 7. Salvar resultado 🔒
+### 8. Salvar resultado 🔒
 **POST** `/partida/resultado`
 
 Grava um resultado já corrigido no cliente (quizzes locais do EsporteKids). Pontuação = `acertos * 10`.
@@ -151,7 +157,7 @@ Grava um resultado já corrigido no cliente (quizzes locais do EsporteKids). Pon
 
 ---
 
-### 8. Histórico 🔒
+### 9. Histórico 🔒
 **GET** `/historico`
 
 Últimas 20 partidas do usuário logado.
@@ -163,7 +169,7 @@ Grava um resultado já corrigido no cliente (quizzes locais do EsporteKids). Pon
 
 ---
 
-### 9. Ranking 🔒
+### 10. Ranking 🔒
 **GET** `/ranking`
 
 Top 10 usuários pela soma das pontuações (empate = mesma posição; desempata a ordem quem chegou primeiro).
@@ -175,7 +181,7 @@ Top 10 usuários pela soma das pontuações (empate = mesma posição; desempata
 
 ---
 
-### 10. Minha posição no ranking 🔒
+### 11. Minha posição no ranking 🔒
 **GET** `/ranking/eu`
 
 Posição do usuário logado no ranking geral (mesmo fora do top 10).
@@ -189,7 +195,7 @@ Posição do usuário logado no ranking geral (mesmo fora do top 10).
 
 ---
 
-### 11. Admin (cargo `adm`) 🔒
+### 12. Admin (cargo `adm`) 🔒
 - **GET** `/admin/perguntas`
 - **POST** `/admin/perguntas`
 - **PUT** `/admin/perguntas/:id`
@@ -201,9 +207,8 @@ Posição do usuário logado no ranking geral (mesmo fora do top 10).
 
 ## Requisitos de Validação
 
-- **Email:** Deve ser um email válido
 - **Senha:** Mínimo de 6 caracteres
-- **Nome:** Obrigatório (mínimo 1 caractere)
+- **Nome:** No cadastro, um dos nomes de `GET /nomes`
 
 ## Segurança
 

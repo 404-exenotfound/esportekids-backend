@@ -177,3 +177,19 @@ INSERT INTO alternativas (pergunta_id, texto, correta) SELECT id, unnest(ARRAY['
 
 WITH p AS (INSERT INTO perguntas (materia_id, enunciado) VALUES (5, 'Quem interpretou o personagem Jack em "Titanic" (1997)?') RETURNING id)
 INSERT INTO alternativas (pergunta_id, texto, correta) SELECT id, unnest(ARRAY['Leonardo DiCaprio','Brad Pitt','Tom Hanks','Johnny Depp','Matt Damon']), unnest(ARRAY[true,false,false,false,false]) FROM p;
+
+-- ============================================================
+-- Seed — Materias do EsporteKids
+-- Idempotente: pode rodar de novo sem duplicar. O front casa
+-- o esporte com a matéria pelo nome.
+-- ============================================================
+INSERT INTO materias (nome, icone)
+SELECT v.nome, v.icone
+FROM (VALUES
+  ('Basquete',  '🏀'),
+  ('Futebol',   '⚽'),
+  ('Atletismo', '🏃'),
+  ('Ping Pong', '🏓'),
+  ('Boliche',   '🎳')
+) AS v(nome, icone)
+WHERE NOT EXISTS (SELECT 1 FROM materias m WHERE m.nome = v.nome);

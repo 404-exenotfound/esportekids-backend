@@ -1,4 +1,4 @@
-# Rotas da API de Usuários
+# Rotas da API
 
 ## Base URL
 ```
@@ -89,6 +89,104 @@ Registra um novo usuário com senha hasheada usando bcrypt.
 
 ---
 
+> Rotas marcadas com 🔒 exigem o header `Authorization: Bearer <token>` (401 sem token ou com token inválido/expirado).
+
+### 4. Matérias
+**GET** `/materias`
+
+Lista as matérias. No EsporteKids, cada esporte é uma matéria (casada pelo nome).
+
+**Resposta (200):**
+```json
+[{ "id": 6, "nome": "Basquete", "icone": "🏀" }]
+```
+
+---
+
+### 5. Quiz 🔒
+**GET** `/quiz?materias=1,2`
+
+Até 10 perguntas aleatórias das matérias informadas (sem indicar a correta).
+
+**Erros:** 400 (nenhuma matéria / IDs inválidos)
+
+---
+
+### 6. Salvar partida 🔒
+**POST** `/partida`
+
+Corrige no servidor as respostas de um quiz vindo de `/quiz`.
+
+**Request Body:**
+```json
+{
+  "materias": [1, 2],
+  "respostas": [{ "pergunta_id": 10, "alternativa_id": 42 }]
+}
+```
+
+**Resposta (201):**
+```json
+{ "partida_id": 1, "acertos": 7, "total_perguntas": 10, "pontuacao": 70 }
+```
+
+---
+
+### 7. Salvar resultado 🔒
+**POST** `/partida/resultado`
+
+Grava um resultado já corrigido no cliente (quizzes locais do EsporteKids). Pontuação = `acertos * 10`.
+
+**Request Body:**
+```json
+{ "materia_id": 6, "acertos": 3, "total_perguntas": 4 }
+```
+
+**Resposta (201):**
+```json
+{ "partida_id": 2, "acertos": 3, "total_perguntas": 4, "pontuacao": 30 }
+```
+
+**Erros:** 400 (dados inválidos, `acertos > total_perguntas` ou matéria inexistente)
+
+---
+
+### 8. Histórico 🔒
+**GET** `/historico`
+
+Últimas 20 partidas do usuário logado.
+
+**Resposta (200):**
+```json
+[{ "id": 2, "pontuacao": 30, "acertos": 3, "total_perguntas": 4, "created_at": "2026-10-23T20:00:00.000Z", "materias": ["Basquete"] }]
+```
+
+---
+
+### 9. Ranking 🔒
+**GET** `/ranking`
+
+Top 10 usuários pela soma das pontuações.
+
+**Resposta (200):**
+```json
+[{ "posicao": "1", "id": 1, "nome": "João", "pontuacao_total": "120", "partidas": "4", "ultima_jogada": "2026-10-23T20:00:00.000Z" }]
+```
+
+> `posicao`, `pontuacao_total` e `partidas` chegam como **string** (bigint do PostgreSQL).
+
+---
+
+### 10. Admin (cargo `adm`) 🔒
+- **GET** `/admin/perguntas`
+- **POST** `/admin/perguntas`
+- **PUT** `/admin/perguntas/:id`
+- **DELETE** `/admin/perguntas/:id`
+
+**Erros:** 403 se o usuário não for `adm`.
+
+---
+
 ## Requisitos de Validação
 
 - **Email:** Deve ser um email válido
@@ -104,10 +202,11 @@ Registra um novo usuário com senha hasheada usando bcrypt.
 ## Variáveis de Ambiente
 
 ```bash
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=
-DB_NAME=aula
 JWT_SECRET=sua-chave-secreta
+DB_HOST=host-do-postgres
+DB_DATABASE=defaultdb
+DB_USER=doadmin
+DB_PASSWORD=
 PORT=3000
+FRONTEND_URL=http://localhost:5173   # origem liberada no CORS
 ```

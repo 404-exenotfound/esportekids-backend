@@ -5,8 +5,7 @@ const { db } = require("../../db");
 
 const loginSchema = z.object({
   nome: z.string().trim().min(1, "Nome obrigatório"),
-  // Sem mínimo aqui: o mínimo de 6 vale no cadastro, e o root usa a senha "root"
-  senha: z.string().min(1, "Senha obrigatória"),
+  senha: z.string().min(6, "Senha deve ter no mínimo 6 caracteres"),
 });
 
 // curl -X POST -H "Content-Type: application/json" -d '{"nome": "Pedro2", "senha": "123456"}' http://localhost:3000/login

@@ -10,7 +10,7 @@ const bcrypt = require("bcrypt");
 const { db } = require("../src/db");
 
 const NOME = "root";
-const SENHA = "Senha@123";
+const SENHA = "root";
 
 const main = async () => {
   const senhaHash = await bcrypt.hash(SENHA, 10);

@@ -242,13 +242,13 @@ Usuário com `cargo = 'root'`. No front, só ele vê o botão **Liberar todos os
 npm run criar-root
 ```
 
-Login: nome `root`, senha `Senha@123` (fixa em `scripts/criarRoot.js`). Rodar o script de novo só reaplica a senha.
+Login: nome `root`, senha `root` (fixa em `scripts/criarRoot.js`). Rodar o script de novo só reaplica a senha.
 
 ---
 
 ## Requisitos de Validação
 
-- **Senha:** Mínimo de 6 caracteres
+- **Senha:** Mínimo de 6 caracteres no cadastro (no login só é obrigatória)
 - **Nome:** No cadastro, um dos nomes de `GET /nomes`
 
 ## Segurança

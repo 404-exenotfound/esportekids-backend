@@ -5,6 +5,7 @@ const materiasRouter = require("./src/routes/materias");
 const quizRouter = require("./src/routes/quiz");
 const partidasRouter = require("./src/routes/partidas");
 const adminRouter = require("./src/routes/admin");
+const progressoRouter = require("./src/routes/progresso");
 
 const app = express();
 app.use(express.json());
@@ -23,6 +24,7 @@ app.use("/", materiasRouter());
 app.use("/", quizRouter());
 app.use("/", partidasRouter());
 app.use("/", adminRouter());
+app.use("/", progressoRouter());
 
 app.listen(PORT, () => {
   console.log(`Servidor rodando na porta ${PORT}`);

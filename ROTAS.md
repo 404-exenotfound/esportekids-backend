@@ -205,6 +205,47 @@ Posição do usuário logado no ranking geral (mesmo fora do top 10).
 
 ---
 
+### 13. Buscar progresso 🔒
+**GET** `/progresso`
+
+Progresso do EsporteKids do usuário logado, ou `null` se ele ainda não salvou nada.
+
+**Resposta (200):**
+```json
+{
+  "estrelas": { "basquete": { "quiz": 3, "matematica": 2 } },
+  "curiosidades_lidas": ["basquete-0"],
+  "jogos_liberados": ["basquete", "futebol"],
+  "conquistas": ["primeira-estrela"],
+  "updated_at": "2026-11-05T20:00:00.000Z"
+}
+```
+
+---
+
+### 14. Salvar progresso 🔒
+**PUT** `/progresso`
+
+Substitui o progresso salvo. O front envia o estado completo a cada mudança.
+
+**Request Body:** o mesmo formato da resposta acima, sem `updated_at`. `jogos_liberados` e as chaves de `estrelas` têm que ser `basquete`, `futebol`, `atletismo`, `pingpong` ou `boliche`.
+
+**Erros:** 400 (dados inválidos)
+
+---
+
+## Usuário root
+
+Usuário com `cargo = 'root'`. No front, só ele vê o botão **Liberar todos os jogos**. Não dá para criá-lo pelo `/registro`; use o script:
+
+```bash
+npm run criar-root
+```
+
+Login: nome `root`, senha `Senha@123` (fixa em `scripts/criarRoot.js`). Rodar o script de novo só reaplica a senha.
+
+---
+
 ## Requisitos de Validação
 
 - **Senha:** Mínimo de 6 caracteres

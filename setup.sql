@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS usuarios (
   -- com número quando repete: Pedro, Pedro2, Pedro3...
   nome       VARCHAR(255) UNIQUE NOT NULL,
   senha      VARCHAR(255) NOT NULL,
+  -- cliente | adm | root (root libera todos os jogos de uma vez)
   cargo      VARCHAR(10)  NOT NULL DEFAULT 'cliente',
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -53,6 +54,18 @@ CREATE TABLE IF NOT EXISTS partida_materias (
   partida_id INT NOT NULL REFERENCES partidas(id) ON DELETE CASCADE,
   materia_id INT NOT NULL REFERENCES materias(id),
   PRIMARY KEY (partida_id, materia_id)
+);
+
+-- Progresso do EsporteKids (1 linha por usuário). Espelha o slice
+-- "progresso" do front; "conquistas" guarda os ids já desbloqueados
+-- (ex.: {"curioso","campeao"}). O front envia tudo a cada mudança.
+CREATE TABLE IF NOT EXISTS progresso (
+  usuario_id         INT PRIMARY KEY REFERENCES usuarios(id) ON DELETE CASCADE,
+  estrelas           JSONB  NOT NULL DEFAULT '{}',
+  curiosidades_lidas TEXT[] NOT NULL DEFAULT '{}',
+  jogos_liberados    TEXT[] NOT NULL DEFAULT '{}',
+  conquistas         TEXT[] NOT NULL DEFAULT '{}',
+  updated_at         TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- ============================================================
